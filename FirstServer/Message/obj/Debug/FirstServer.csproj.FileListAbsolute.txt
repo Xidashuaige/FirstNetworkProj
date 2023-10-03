@@ -1,0 +1,7 @@
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\FirstServer\bin\Debug\FirstServer.dll.config
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\FirstServer\bin\Debug\FirstServer.dll
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\FirstServer\bin\Debug\FirstServer.pdb
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\FirstServer\obj\Debug\FirstServer.csproj.AssemblyReference.cache
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\FirstServer\obj\Debug\FirstServer.csproj.CoreCompileInputs.cache
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\FirstServer\obj\Debug\FirstServer.dll
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\FirstServer\obj\Debug\FirstServer.pdb

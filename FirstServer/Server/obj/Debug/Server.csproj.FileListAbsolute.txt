@@ -1,0 +1,8 @@
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\bin\Debug\Server.exe.config
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\bin\Debug\Server.exe
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\bin\Debug\Server.pdb
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Debug\Server.csproj.AssemblyReference.cache
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Debug\Server.exe
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Debug\Server.pdb
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Debug\Server.csproj.CopyComplete
