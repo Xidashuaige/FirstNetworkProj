@@ -4,32 +4,32 @@ using Multiplay;
 public class Network
 {
     /// <summary>
-    /// 启动服务器
+    /// Init Network and Start server
     /// </summary>
     /// <param name="ip">IPv4地址</param>
     public Network(string ip)
     {
-        //注册
-        Server.Register(MessageType.HeartBeat, _HeartBeat);
-        Server.Register(MessageType.Enroll, _Enroll);
-        Server.Register(MessageType.CreatRoom, _CreatRoom);
-        Server.Register(MessageType.EnterRoom, _EnterRoom);
-        Server.Register(MessageType.ExitRoom, _ExitRoom);
-        Server.Register(MessageType.StartGame, _StartGame);
-        Server.Register(MessageType.PlayChess, _PlayChess);
-        Server.Register(MessageType.SendMessage, _SendMessage);
+        //Register callbacks
+        Server.Register(MessageType.HeartBeat, HeartBeat);
+        Server.Register(MessageType.Enroll, Enroll);
+        Server.Register(MessageType.CreatRoom, CreatRoom);
+        Server.Register(MessageType.EnterRoom, EnterRoom);
+        Server.Register(MessageType.ExitRoom, ExitRoom);
+        Server.Register(MessageType.StartGame, StartGame);
+        Server.Register(MessageType.PlayChess, PlayChess);
+        Server.Register(MessageType.SendMessage, SendMessage);
 
-        //启动服务器
+        //Start Server
         Server.Start(ip);
     }
 
-    private void _HeartBeat(Player player, byte[] data)
+    private void HeartBeat(Player player, byte[] data)
     {
-        //仅做回应
+        // just for check if server 
         player.Send(MessageType.HeartBeat);
     }
 
-    private void _Enroll(Player player, byte[] data)
+    private void Enroll(Player player, byte[] data)
     {
         Enroll result = new Enroll();
 
@@ -46,7 +46,7 @@ public class Network
         player.Send(MessageType.Enroll, data);
     }
 
-    private void _CreatRoom(Player player, byte[] data)
+    private void CreatRoom(Player player, byte[] data)
     {
         //结果
         CreatRoom result = new CreatRoom();
@@ -80,7 +80,7 @@ public class Network
         }
     }
 
-    private void _EnterRoom(Player player, byte[] data)
+    private void EnterRoom(Player player, byte[] data)
     {
         //结果
         EnterRoom result = new EnterRoom();
@@ -101,7 +101,7 @@ public class Network
 
                 //向玩家发送成功操作结果
                 result.RoomId = receive.RoomId;
-                result.result = EnterRoom.Result.Player;
+                result.result = Multiplay.EnterRoom.Result.Player;
                 data = NetworkUtils.Serialize(result);
                 player.Send(MessageType.EnterRoom, data);
             }
@@ -115,7 +115,7 @@ public class Network
 
                 //向玩家发送成功操作结果
                 result.RoomId = receive.RoomId;
-                result.result = EnterRoom.Result.Observer;
+                result.result = Multiplay.EnterRoom.Result.Observer;
                 data = NetworkUtils.Serialize(result);
                 player.Send(MessageType.EnterRoom, data);
             }
@@ -124,7 +124,7 @@ public class Network
             {
                 Console.WriteLine($"玩家:{player.Name}加入房间失败");
 
-                result.result = EnterRoom.Result.None;
+                result.result = Multiplay.EnterRoom.Result.None;
                 data = NetworkUtils.Serialize(result);
                 player.Send(MessageType.EnterRoom, data);
             }
@@ -138,7 +138,7 @@ public class Network
         }
     }
 
-    private void _ExitRoom(Player player, byte[] data)
+    private void ExitRoom(Player player, byte[] data)
     {
         //结果
         ExitRoom result = new ExitRoom();
@@ -192,7 +192,7 @@ public class Network
         }
     }
 
-    private void _StartGame(Player player, byte[] data)
+    private void StartGame(Player player, byte[] data)
     {
         //结果
         StartGame result = new StartGame();
@@ -261,7 +261,7 @@ public class Network
         }
     }
 
-    private void _PlayChess(Player player, byte[] data)
+    private void PlayChess(Player player, byte[] data)
     {
         //结果
         PlayChess result = new PlayChess();
@@ -279,7 +279,7 @@ public class Network
                 //判断结果
                 Chess chess = Server.Rooms[receive.RoomId].GamePlay.Calculate(receive.X, receive.Y);
                 //检测操作:如果游戏结束
-                bool over = _ChessResult(chess, result);
+                bool over = ChessResult(chess, result);
 
                 if (result.Suc)
                 {
@@ -331,7 +331,7 @@ public class Network
         }
     }
 
-    private void _SendMessage(Player player, byte[] data)
+    private void SendMessage(Player player, byte[] data)
     {
         SendMessage receive = NetworkUtils.Deserialize<SendMessage>(data);
 
@@ -354,7 +354,7 @@ public class Network
         }
     }
 
-    private bool _ChessResult(Chess chess, PlayChess result)
+    private bool ChessResult(Chess chess, PlayChess result)
     {
         bool over = false;
         //操作成功

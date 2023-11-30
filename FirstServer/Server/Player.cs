@@ -2,13 +2,13 @@
 
 public class Player
 {
-    public Socket Socket; //网络套接字
+    public Socket Socket;
 
-    public string Name;   //玩家名字
+    public string Name;  
 
-    public bool InRoom;   //是否在房间中
+    public bool InRoom;  
 
-    public int RoomId;    //所处房间号码
+    public int RoomId;  
 
     public Player(Socket socket)
     {
@@ -19,7 +19,7 @@ public class Player
     }
 
     /// <summary>
-    /// 进入房间
+    /// join the room
     /// </summary>
     public void EnterRoom(int roomId)
     {
@@ -28,7 +28,7 @@ public class Player
     }
 
     /// <summary>
-    /// 退出房间
+    /// leave the room
     /// </summary>
     public void ExitRoom()
     {

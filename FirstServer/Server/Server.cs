@@ -35,33 +35,32 @@ public class Room
 {
     public enum RoomState
     {
-        Await,  //等待
-        Gaming  //对局开始
+        Await,  
+        Gaming  
     }
 
-    //房间ID
+
     public int RoomId = 0;
-    //房间棋盘信息
+
     public GamePlay GamePlay;
-    //房间状态
+
     public RoomState State = RoomState.Await;
 
-    //最大玩家数量
     public const int MAX_PLAYER_AMOUNT = 2;
-    //最大观察者数量
+
     public const int MAX_OBSERVER_AMOUNT = 2;
 
-    public List<Player> Players = new List<Player>(); //玩家集合
-    public List<Player> OBs = new List<Player>();     //观察者集合
+    public List<Player> Players = new List<Player>(); 
+    public List<Player> OBs = new List<Player>();    
 
-    public Room(int roomId)                           //构造
+    public Room(int roomId)                         
     {
         RoomId = roomId;
         GamePlay = new GamePlay();
     }
 
     /// <summary>
-    /// 关闭房间:从房间字典中移除并且所有房间中的玩家清除
+    /// Close Room: Remove room from the room list and clear players
     /// </summary>
     public void Close()
     {
@@ -83,20 +82,23 @@ public class Room
 /// </summary>
 public static class Server
 {
-    public static Dictionary<int, Room> Rooms;                  //游戏房间集合
+    public static Dictionary<int, Room> Rooms;                  //list of rooms
 
-    public static List<Player> Players;                         //玩家集合
+    public static List<Player> Players;                         //list of players
 
-    private static ConcurrentQueue<CallBack> _callBackQueue;    //回调方法队列
+    private static ConcurrentQueue<CallBack> _callBackQueue;    //callback queue in the main thread
 
     private static Dictionary<MessageType, ServerCallBack> _callBacks
-        = new Dictionary<MessageType, ServerCallBack>();        //消息类型与回调方法
+        = new Dictionary<MessageType, ServerCallBack>();        //Messagetype and callback
 
-    private static Socket _serverSocket;                        //服务器socket
+    private static Socket _serverSocket;                        //server socket
 
-    #region 线程相关
+    #region about thread
 
-    private static void _Callback()
+    /// <summary>
+    /// Main loop
+    /// </summary>
+    private static void Callback()
     {
         while (true)
         {
@@ -104,16 +106,19 @@ public static class Server
             {
                 if (_callBackQueue.TryDequeue(out CallBack callBack))
                 {
-                    //执行回调
+                    //execute callback
                     callBack.Execute();
                 }
             }
-            //让出线程
+            //Sleep to avoid block the thread
             Thread.Sleep(10);
         }
     }
 
-    private static void _Await()
+    /// <summary>
+    /// Wait for new client
+    /// </summary>
+    private static void Await()
     {
         Socket client = null;
 
@@ -121,22 +126,23 @@ public static class Server
         {
             try
             {
-                //同步等待
-                client = _serverSocket.Accept(); // 这句应该会阻塞代码
+                // waiting for client
+                client = _serverSocket.Accept(); // this line will block the thread
 
-                //获取客户端唯一键
+                // get client endpoint
                 string endPoint = client.RemoteEndPoint.ToString();
 
-                //新增玩家
+                // new player
                 Player player = new Player(client);
                 Players.Add(player);
 
-                Console.WriteLine($"{player.Socket.RemoteEndPoint}连接成功");
+                Console.WriteLine($"{player.Socket.RemoteEndPoint} connect");
 
-                //创建特定类型的方法
-                ParameterizedThreadStart receiveMethod = new ParameterizedThreadStart(_Receive);
+                // create thread for new player
+                ParameterizedThreadStart receiveMethod = new ParameterizedThreadStart(Receive);
                 Thread listener = new Thread(receiveMethod) { IsBackground = true };
-                //开始监听该客户端发送的消息
+                
+                // start listen to this player
                 listener.Start(player);
             }
             catch (Exception ex)
@@ -146,19 +152,18 @@ public static class Server
         }
     }
 
-    private static void _Receive(object obj)
+    private static void Receive(object obj)
     {
         Player player = obj as Player;
         Socket client = player.Socket;
 
-        //持续接受消息
         while (true)
         {
-            //解析数据包过程(服务器与客户端需要严格按照一定的协议制定数据包)
+            // 解析数据包过程(服务器与客户端需要严格按照一定的协议制定数据包)
             byte[] data = new byte[4];
 
-            int length = 0;                            //消息长度
-            MessageType type = MessageType.None;       //类型
+            int length = 0;                            // message lenght
+            MessageType type = MessageType.None;       // message type
             int receive = 0;                           //接收信息
 
             try
@@ -230,11 +235,11 @@ public static class Server
     #endregion
 
     /// <summary>
-    /// 启动服务器
+    /// Start Server
     /// </summary>
     public static void Start(string ip)
     {
-        //事件处理
+        //init callback queue
         _callBackQueue = new ConcurrentQueue<CallBack>();
 
         Rooms = new Dictionary<int, Room>();
@@ -242,21 +247,20 @@ public static class Server
         _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         Players = new List<Player>();
         
+        // Init ip adress and port
         IPEndPoint point = new IPEndPoint(IPAddress.Any, 8848);
         //IPEndPoint point = new IPEndPoint(IPAddress.Parse(ip), 8848);
-        
-        //Console.WriteLine(point.Address);
-        
-        _serverSocket.Bind(point); //初始化服务器ip地址与端口号
+             
+        _serverSocket.Bind(point); 
 
-        _serverSocket.Listen(0); //开启监听
+        _serverSocket.Listen(0);
 
-        //开启等待玩家线程
-        Thread thread = new Thread(_Await) { IsBackground = true };
+        //Start waiting client
+        Thread thread = new Thread(Await) { IsBackground = true };
         thread.Start();
 
-        //开启回调方法线程
-        Thread handle = new Thread(_Callback) { IsBackground = true };
+        //Start handle callbacks
+        Thread handle = new Thread(Callback) { IsBackground = true };
         handle.Start();
     }
 
@@ -266,66 +270,67 @@ public static class Server
     }
 
     /// <summary>
-    /// 注册消息回调事件
+    /// Register callbacks
     /// </summary>
     public static void Register(MessageType type, ServerCallBack method)
     {
         if (!_callBacks.ContainsKey(type)) _callBacks.Add(type, method);
-        else Console.WriteLine("注册了相同的回调事件");
+        else Console.WriteLine("Callback has already registered");
     }
 
     /// <summary>
-    /// 封装并发送信息
+    /// packaging and send message
     /// </summary>
     public static void Send(this Player player, MessageType type, byte[] data = null)
     {
-        //封装消息
-        byte[] bytes = _Pack(type, data);
+        //Pack message
+        byte[] bytes = Pack(type, data);
 
-        //发送消息
+        //Send message
         try
         {
             player.Socket.Send(bytes);
         }
         catch (Exception ex)
         {
-            //客户端掉线
+            // client offline
             Console.WriteLine(ex.Message);
             player.Offline();
         }
     }
 
     /// <summary>
-    /// 服务器接受玩家请求失败时, 玩家掉线
+    /// Remove client from server
     /// </summary>
     public static void Offline(this Player player)
     {
-        //移除该玩家
+        // remove from the list
         Players.Remove(player);
 
-        //如果该玩家此时在线
+        // if this player are in the room
         if (player.InRoom)
         {
+            // close the room
             Rooms[player.RoomId].Close();
         }
     }
 
     /// <summary>
-    /// 封装数据
+    /// wrap message
     /// </summary>
-    private static byte[] _Pack(MessageType type, byte[] data = null)
+    private static byte[] Pack(MessageType type, byte[] data = null)
     {
         MessagePacker packer = new MessagePacker();
         if (data != null)
         {
-            packer.Add((ushort)(4 + data.Length)); //消息长度
-            packer.Add((ushort)type);              //消息类型
-            packer.Add(data);                      //消息内容
+            packer.Add((ushort)(4 + data.Length)); // message lenght
+            packer.Add((ushort)type);              // message type
+            packer.Add(data);                      // message data
         }
         else
         {
-            packer.Add(4);                         //消息长度
-            packer.Add((ushort)type);              //消息类型
+            packer.Add(4);                         // message lenght
+            packer.Add((ushort)type);              // message type
         }
         return packer.Package;
     }
