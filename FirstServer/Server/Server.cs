@@ -160,11 +160,11 @@ public static class Server
         while (true)
         {
             // The server and client need to formulate data packages strictly in accordance with certain protocols
-            byte[] data = new byte[4]; // firstly we only read the first 4 byte, which will be the message type
+            byte[] data = new byte[4]; // firstly we only read the first 4 byte, which will be message length (2bytes) & message type (2 bytes)
 
             int length = 0;                            // message length
             MessageType type = MessageType.None;       // message type
-            int receive = 0;                           // length received
+            int receive;                           // length received
 
             try
             {

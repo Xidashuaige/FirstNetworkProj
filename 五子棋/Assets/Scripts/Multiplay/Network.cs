@@ -6,9 +6,6 @@ public class Network : MonoBehaviour
     private Network() { }
     public static Network Instance { get; private set; }
 
-    /// <summary>
-    /// 注册
-    /// </summary>
     public void EnrollRequest(string name)
     {
         Enroll request = new Enroll();
@@ -17,9 +14,6 @@ public class Network : MonoBehaviour
         NetworkClient.Enqueue(MessageType.Enroll, data);
     }
 
-    /// <summary>
-    /// 创建房间
-    /// </summary>
     public void CreatRoomRequest(int roomId)
     {
         CreatRoom request = new CreatRoom();
@@ -28,9 +22,6 @@ public class Network : MonoBehaviour
         NetworkClient.Enqueue(MessageType.CreatRoom, data);
     }
 
-    /// <summary>
-    /// 加入房间
-    /// </summary>
     public void EnterRoomRequest(int roomId)
     {
         EnterRoom request = new EnterRoom();
@@ -39,9 +30,6 @@ public class Network : MonoBehaviour
         NetworkClient.Enqueue(MessageType.EnterRoom, data);
     }
 
-    /// <summary>
-    /// 退出房间
-    /// </summary>
     public void ExitRoomRequest(int roomId)
     {
         ExitRoom request = new ExitRoom();
@@ -50,9 +38,6 @@ public class Network : MonoBehaviour
         NetworkClient.Enqueue(MessageType.ExitRoom, data);
     }
 
-    /// <summary>
-    /// 开始游戏
-    /// </summary>
     public void StartGameRequest(int roomId)
     {
         StartGame request = new StartGame();
@@ -61,9 +46,6 @@ public class Network : MonoBehaviour
         NetworkClient.Enqueue(MessageType.StartGame, data);
     }
 
-    /// <summary>
-    /// 下棋请求
-    /// </summary>
     public void PlayChessRequest(int roomId)
     {
         //进行棋盘操作检测
@@ -96,25 +78,25 @@ public class Network : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
-        NetworkClient.Register(MessageType.HeartBeat, _Heartbeat);
-        NetworkClient.Register(MessageType.Enroll, _Enroll);
-        NetworkClient.Register(MessageType.CreatRoom, _CreatRoom);
-        NetworkClient.Register(MessageType.EnterRoom, _EnterRoom);
-        NetworkClient.Register(MessageType.ExitRoom, _ExitRoom);
-        NetworkClient.Register(MessageType.StartGame, _StartGame);
-        NetworkClient.Register(MessageType.PlayChess, _PlayChess);
-        NetworkClient.Register(MessageType.SendMessage, _SendMessage);
+        NetworkClient.Register(MessageType.HeartBeat, Heartbeat);
+        NetworkClient.Register(MessageType.Enroll, Enroll);
+        NetworkClient.Register(MessageType.CreatRoom, CreatRoom);
+        NetworkClient.Register(MessageType.EnterRoom, EnterRoom);
+        NetworkClient.Register(MessageType.ExitRoom, ExitRoom);
+        NetworkClient.Register(MessageType.StartGame, StartGame);
+        NetworkClient.Register(MessageType.PlayChess, PlayChess);
+        NetworkClient.Register(MessageType.SendMessage, SendMessage);
     }
 
-    #region 发送消息回调事件
+    #region Send message callback
 
-    private void _Heartbeat(byte[] data)
+    private void Heartbeat(byte[] data)
     {
         NetworkClient.Received = true;
-        Debug.Log("收到心跳包回应");
+        Debug.Log("receive heart beat");
     }
 
-    private void _Enroll(byte[] data)
+    private void Enroll(byte[] data)
     {
         Enroll result = NetworkUtils.Deserialize<Enroll>(data);
         if (result.Suc)
@@ -123,15 +105,15 @@ public class Network : MonoBehaviour
 
             NetworkPlayer.Instance.OnNameChange(result.Name);
 
-            Info.Instance.Print("注册成功");
+            Info.Instance.Print("Enroll successful");
         }
         else
         {
-            Info.Instance.Print("注册失败");
+            Info.Instance.Print("Enroll faild");
         }
     }
 
-    private void _CreatRoom(byte[] data)
+    private void CreatRoom(byte[] data)
     {
         CreatRoom result = NetworkUtils.Deserialize<CreatRoom>(data);
 
@@ -141,41 +123,41 @@ public class Network : MonoBehaviour
 
             NetworkPlayer.Instance.OnRoomIdChange(result.RoomId);
 
-            Info.Instance.Print(string.Format("创建房间成功, 你的房间号是{0}", NetworkPlayer.Instance.RoomId));
+            Info.Instance.Print(string.Format("Create room successful, your room id is: {0}", NetworkPlayer.Instance.RoomId));
         }
         else
         {
-            Info.Instance.Print("创建房间失败");
+            Info.Instance.Print("Create room faild");
         }
     }
 
-    private void _EnterRoom(byte[] data)
+    private void EnterRoom(byte[] data)
     {
         EnterRoom result = NetworkUtils.Deserialize<EnterRoom>(data);
 
-        if (result.result == EnterRoom.Result.Player)
+        if (result.result == Multiplay.EnterRoom.Result.Player)
         {
             NetworkGameplay.Instance.ChangePage(NetworkGameplay.Pages.InRoom);
 
-            Info.Instance.Print("加入房间成功, 你是一名玩家");
+            Info.Instance.Print("Join room successful, you're a player");
         }
-        else if (result.result == EnterRoom.Result.Observer)
+        else if (result.result == Multiplay.EnterRoom.Result.Observer)
         {
             NetworkGameplay.Instance.ChangePage(NetworkGameplay.Pages.InRoom);
 
-            Info.Instance.Print("加入房间成功, 你是一名观察者");
+            Info.Instance.Print("Join room successful, you're a observer");
         }
         else
         {
-            Info.Instance.Print("加入房间失败");
+            Info.Instance.Print("Join room faild");
             return;
         }
 
-        //进入房间
+        // Jooin room
         NetworkPlayer.Instance.OnRoomIdChange(result.RoomId);
     }
 
-    private void _ExitRoom(byte[] data)
+    private void ExitRoom(byte[] data)
     {
         ExitRoom result = NetworkUtils.Deserialize<ExitRoom>(data);
 
@@ -183,37 +165,37 @@ public class Network : MonoBehaviour
         {
             NetworkGameplay.Instance.ChangePage(NetworkGameplay.Pages.CreateRoom);
 
-            //房间号变为默认
+            // Change room id to 0
             NetworkPlayer.Instance.OnRoomIdChange(0);
-            //玩家状态改变
+            // Cange player state
             NetworkPlayer.Instance.OnPlayingChange(false);
 
-            Info.Instance.Print("退出房间成功");
+            Info.Instance.Print("Leave room successful");
         }
         else
         {
-            Info.Instance.Print("退出房间失败");
+            Info.Instance.Print("Leave room faild");
         }
     }
 
-    private void _StartGame(byte[] data)
+    private void StartGame(byte[] data)
     {
         StartGame result = NetworkUtils.Deserialize<StartGame>(data);
 
         if (result.Suc)
         {
-            //开始游戏事件
+            // Start game
             NetworkPlayer.Instance.OnPlayingChange(true);
 
-            //是观察者
+            // Observer case
             if (result.Watch)
             {
                 NetworkPlayer.Instance.OnStartGame(Chess.None);
             }
-            //是玩家
+            // Player case
             else
             {
-                //是否先手(先手执黑棋, 后手执白棋)
+                // Who start
                 if (result.First)
                     NetworkPlayer.Instance.OnStartGame(Chess.Black);
                 else
@@ -222,11 +204,11 @@ public class Network : MonoBehaviour
         }
         else
         {
-            Info.Instance.Print("开始游戏失败");
+            Info.Instance.Print("Start game faild");
         }
     }
 
-    private void _PlayChess(byte[] data)
+    private void PlayChess(byte[] data)
     {
         PlayChess result = NetworkUtils.Deserialize<PlayChess>(data);
 
@@ -258,17 +240,17 @@ public class Network : MonoBehaviour
         NetworkGameplay.Instance.InstChess(result.Chess, new Vec2(result.X, result.Y));
     }
 
-    private void _SendMessage(byte[] data)
+    private void SendMessage(byte[] data)
     {
         SendMessage result = NetworkUtils.Deserialize<SendMessage>(data);
 
         if (!result.Suc)
         {
-            Info.Instance.Print("消息接收失败");
+            Info.Instance.Print("Message receive faild");
             return;
         }
 
-        // 显示消息
+        // Print test
         NetworkGameplay.Instance.ShowText(result.Owner + ": " + result.Message);
     }
 

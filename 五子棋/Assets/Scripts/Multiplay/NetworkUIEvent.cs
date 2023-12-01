@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-/// <summary>
-/// 网络UI事件
-/// </summary>
+
 public class NetworkUIEvent : MonoBehaviour
 {
     [SerializeField]
@@ -41,7 +39,7 @@ public class NetworkUIEvent : MonoBehaviour
 
     private void Start()
     {
-        //绑定按钮事件
+        // add listener for buttons
         _connectServerBtn.onClick.AddListener(ConnectServerBtn);
         _enrollBtn.onClick.AddListener(EnrollBtn);
         _creatRoomBtn.onClick.AddListener(CreatRoomBtn);
@@ -53,9 +51,9 @@ public class NetworkUIEvent : MonoBehaviour
         NetworkPlayer.Instance.OnPlayingChange += (playing) =>
         {
             if (playing)
-                _gameStateTxt.text = "游戏";
+                _gameStateTxt.text = "Gaming";
             else
-                _gameStateTxt.text = "空闲";
+                _gameStateTxt.text = "Waiting";
         };
 
         NetworkPlayer.Instance.OnRoomIdChange += (roomId) =>
@@ -66,7 +64,7 @@ public class NetworkUIEvent : MonoBehaviour
         NetworkPlayer.Instance.OnStartGame += (chess) =>
         {
             _hide.SetActive(false);
-            Info.Instance.Print(string.Format("开始游戏成功:这局你是{0}棋!", chess));
+            Info.Instance.Print(string.Format("Game Start: You're {0} chess!", chess));
         };
 
         NetworkPlayer.Instance.OnNameChange += (name) =>
@@ -81,7 +79,7 @@ public class NetworkUIEvent : MonoBehaviour
             NetworkClient.Connect(_ipAddressIpt.text);
         else
         {
-            Info.Instance.Print("IP地址不能为空");
+            Info.Instance.Print("ip cannot be empty");
         }
     }
 
@@ -91,33 +89,31 @@ public class NetworkUIEvent : MonoBehaviour
             Network.Instance.EnrollRequest(_nameIpt.text);
         else
         {
-            Info.Instance.Print("名字不能为空");
+            Info.Instance.Print("name cannot be empty");
         }
     }
 
     private void CreatRoomBtn()
     {
-        int roomId;
-        int.TryParse(_roomIdIpt.text, out roomId);
+        int.TryParse(_roomIdIpt.text, out int roomId);
 
         if (roomId != 0)
             Network.Instance.CreatRoomRequest(roomId);
         else
         {
-            Info.Instance.Print("不能以0作为房间号");
+            Info.Instance.Print("cannot use 0 for room id");
         }
     }
 
     private void EnterRoomBtn()
     {
-        int roomId;
-        int.TryParse(_roomIdIpt.text, out roomId);
+        int.TryParse(_roomIdIpt.text, out int roomId);
 
         if (roomId != 0)
             Network.Instance.EnterRoomRequest(roomId);
         else
         {
-            Info.Instance.Print("不能以0作为房间号");
+            Info.Instance.Print("cannot use 0 for room id");
         }
     }
 

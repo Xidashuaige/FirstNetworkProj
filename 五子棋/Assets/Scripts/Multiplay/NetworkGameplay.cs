@@ -107,7 +107,7 @@ public class NetworkGameplay : MonoBehaviour
                 for (int j = 0; j < 15; j++)
                 {
                     //计算鼠标点击点与下棋点的距离(只算x,y平面距离)
-                    float distance = _Distance(hit.point, _chessPos[i, j]);
+                    float distance = Distance(hit.point, _chessPos[i, j]);
                     //鼠标点击
                     if (distance < (_gridWidth / 2))
                     {
@@ -143,7 +143,7 @@ public class NetworkGameplay : MonoBehaviour
     /// <summary>
     /// 计算两个Vector2的距离
     /// </summary>
-    private float _Distance(Vector2 a, Vector2 b)
+    private float Distance(Vector2 a, Vector2 b)
     {
         Vector2 distance = b - a;
         return distance.magnitude;

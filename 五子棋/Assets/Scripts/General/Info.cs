@@ -17,7 +17,7 @@ public class Info : MonoBehaviour
     }
 
     /// <summary>
-    /// ¥Ú”°
+    /// print info on the screen
     /// </summary>
     public void Print(string str, bool warning = false)
     {
