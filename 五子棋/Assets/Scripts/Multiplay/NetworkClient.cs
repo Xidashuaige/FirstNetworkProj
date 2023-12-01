@@ -90,7 +90,7 @@ public static class NetworkClient
     private static float _timer = HEARTBEAT_TIME;   //距离上次接受心跳包的时间
     public static bool Received = true;             //收到心跳包回信
 
-    private static IEnumerator _Connect()
+    private static IEnumerator Connect()
     {
         _client = new TcpClient();
 
@@ -327,7 +327,7 @@ public static class NetworkClient
 
         _port = port;
         //与服务器建立连接
-        NetworkCoroutine.Instance.StartCoroutine(_Connect()); //(连接ip跟端口号成功不保证网络流建立成功)
+        NetworkCoroutine.Instance.StartCoroutine(Connect()); //(连接ip跟端口号成功不保证网络流建立成功)
         // 借助NetworkCoroutine来开启协程,以为NetworkClient没有继承MonoBehavior
     }
 

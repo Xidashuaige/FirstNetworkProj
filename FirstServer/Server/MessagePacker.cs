@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// 消息封装类
-/// </summary>
 public class MessagePacker
 {
     private List<byte> bytes = new List<byte>();

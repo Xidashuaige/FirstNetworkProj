@@ -25,7 +25,7 @@ public class Network
 
     private void HeartBeat(Player player, byte[] data)
     {
-        // just for check if server 
+        // just for check if server is still runing
         player.Send(MessageType.HeartBeat);
     }
 
@@ -35,11 +35,11 @@ public class Network
 
         Enroll receive = NetworkUtils.Deserialize<Enroll>(data);
 
-        Console.WriteLine($"玩家{player.Name}改名为{receive.Name}");
-        //设置玩家名字
+        Console.WriteLine($"Player {player.Name} Change name to: {receive.Name}");
+        //Set player name
         player.Name = receive.Name;
 
-        //向玩家发送成功操作结果
+        // send succes message to player
         result.Suc = true;
         result.Name = receive.Name;
         data = NetworkUtils.Serialize(result);
@@ -48,24 +48,23 @@ public class Network
 
     private void CreatRoom(Player player, byte[] data)
     {
-        //结果
         CreatRoom result = new CreatRoom();
 
         CreatRoom receive = NetworkUtils.Deserialize<CreatRoom>(data);
 
-        //逻辑检测(玩家不在任何房间中 并且 不存在该房间)
+        //Check the player doesn't have room & doesn't hace room with this id
         if (!player.InRoom && !Server.Rooms.ContainsKey(receive.RoomId))
         {
-            //新增房间
+            // Create a new room
             Room room = new Room(receive.RoomId);
             Server.Rooms.Add(room.RoomId, room);
-            //添加玩家
+            // Add player to the room
             room.Players.Add(player);
             player.EnterRoom(receive.RoomId);
 
-            Console.WriteLine($"玩家:{player.Name}创建房间成功");
+            Console.WriteLine($"Player {player.Name}: create room with successful!");
 
-            //向客户端发送操作结果
+            // Send result to client
             result.Suc = true;
             result.RoomId = receive.RoomId;
             data = NetworkUtils.Serialize(result);
@@ -73,8 +72,8 @@ public class Network
         }
         else
         {
-            Console.WriteLine($"玩家:{player.Name}创建房间失败");
-            //向客户端发送操作结果
+            Console.WriteLine($"Player {player.Name}: create room faild");
+            // Send result to client
             data = NetworkUtils.Serialize(result);
             player.Send(MessageType.CreatRoom, data);
         }
@@ -82,47 +81,47 @@ public class Network
 
     private void EnterRoom(Player player, byte[] data)
     {
-        //结果
+        // Result
         EnterRoom result = new EnterRoom();
 
         EnterRoom receive = NetworkUtils.Deserialize<EnterRoom>(data);
 
-        //逻辑检测(玩家不在任何房间中 并且 存在该房间)
+        // Check the player doesn't have room & exist room with this id
         if (!player.InRoom && Server.Rooms.ContainsKey(receive.RoomId))
         {
             Room room = Server.Rooms[receive.RoomId];
-            //加入玩家
+            // join as player 
             if (room.Players.Count < Room.MAX_PLAYER_AMOUNT && !room.Players.Contains(player))
             {
                 room.Players.Add(player);
                 player.EnterRoom(receive.RoomId);
 
-                Console.WriteLine($"玩家:{player.Name}成为了房间:{receive.RoomId}的玩家");
+                Console.WriteLine($"player :{player.Name} join room {receive.RoomId} as player");
 
-                //向玩家发送成功操作结果
+                // send result to client
                 result.RoomId = receive.RoomId;
                 result.result = Multiplay.EnterRoom.Result.Player;
                 data = NetworkUtils.Serialize(result);
                 player.Send(MessageType.EnterRoom, data);
             }
-            //加入观察者
+            // join as observer
             else if (room.OBs.Count < Room.MAX_OBSERVER_AMOUNT && !room.OBs.Contains(player))
             {
                 room.OBs.Add(player);
                 player.EnterRoom(receive.RoomId);
 
-                Console.WriteLine($"玩家:{player.Name}成为了房间:{receive.RoomId}的观察者");
+                Console.WriteLine($"player {player.Name} join room {receive.RoomId} as observer");
 
-                //向玩家发送成功操作结果
+                // send result to client
                 result.RoomId = receive.RoomId;
                 result.result = Multiplay.EnterRoom.Result.Observer;
                 data = NetworkUtils.Serialize(result);
                 player.Send(MessageType.EnterRoom, data);
             }
-            //加入房间失败
+            // join room faild 
             else
             {
-                Console.WriteLine($"玩家:{player.Name}加入房间失败");
+                Console.WriteLine($"player {player.Name}: join room with successful");
 
                 result.result = Multiplay.EnterRoom.Result.None;
                 data = NetworkUtils.Serialize(result);
@@ -131,8 +130,8 @@ public class Network
         }
         else
         {
-            Console.WriteLine($"玩家:{player.Name}进入房间失败");
-            //向玩家发送失败操作结果
+            Console.WriteLine($"Player {player.Name}: join room faild");
+            // send result to client
             data = NetworkUtils.Serialize(result);
             player.Send(MessageType.EnterRoom, data);
         }
@@ -140,20 +139,20 @@ public class Network
 
     private void ExitRoom(Player player, byte[] data)
     {
-        //结果
+        //result
         ExitRoom result = new ExitRoom();
 
         ExitRoom receive = NetworkUtils.Deserialize<ExitRoom>(data);
 
-        //逻辑检测(有该房间)
+        // check if exist this room
         if (Server.Rooms.ContainsKey(receive.RoomId))
         {
-            //确保有该房间并且玩家在该房间内
+            // check if the player is alredy in the room
             if (Server.Rooms[receive.RoomId].Players.Contains(player) ||
                 Server.Rooms[receive.RoomId].OBs.Contains(player))
             {
                 result.Suc = true;
-                //移除该玩家
+                //remove player
                 if (Server.Rooms[receive.RoomId].Players.Contains(player))
                 {
                     Server.Rooms[receive.RoomId].Players.Remove(player);
@@ -165,41 +164,66 @@ public class Network
 
                 if (Server.Rooms[receive.RoomId].Players.Count == 0)
                 {
-                    Server.Rooms.Remove(receive.RoomId); //如果该房间没有玩家则移除该房间
+                    Server.Rooms.Remove(receive.RoomId); // if there is no player, remove the room
                 }
 
-                Console.WriteLine($"玩家:{player.Name}退出房间成功");
+                Console.WriteLine($"Player {player.Name}: leave room with successful");
 
                 player.ExitRoom();
-                //向玩家发送成功操作结果
+                // send result to client
                 data = NetworkUtils.Serialize(result);
                 player.Send(MessageType.ExitRoom, data);
             }
             else
             {
-                Console.WriteLine($"玩家:{player.Name}退出房间失败");
-                //向玩家发送失败操作结果
+                Console.WriteLine($"Player {player.Name}: Leave room faild");
+                // send result to client
                 data = NetworkUtils.Serialize(result);
                 player.Send(MessageType.ExitRoom, data);
             }
         }
         else
         {
-            Console.WriteLine($"玩家:{player.Name}退出房间失败");
-            //向玩家发送失败操作结果
+            Console.WriteLine($"Player {player.Name}: leave room faild");
+            // send result to client
             data = NetworkUtils.Serialize(result);
             player.Send(MessageType.ExitRoom, data);
         }
     }
 
+    private void SendMessage(Player player, byte[] data)
+    {
+        SendMessage receive = NetworkUtils.Deserialize<SendMessage>(data);
+
+        receive.Suc = true;
+
+        if (Server.Rooms.ContainsKey(receive.RoomId))
+        {
+            data = NetworkUtils.Serialize(receive);
+
+            foreach (var each in Server.Rooms[receive.RoomId].Players)
+            {
+                each.Send(MessageType.SendMessage, data);
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Player {player.Name}: send message faild");
+            // send result to player
+            player.Send(MessageType.SendMessage, data);
+        }
+    }
+
+    // For Game
+
     private void StartGame(Player player, byte[] data)
     {
-        //结果
+        //result
         StartGame result = new StartGame();
 
         StartGame receive = NetworkUtils.Deserialize<StartGame>(data);
 
-        //逻辑检测(有该房间)
+        // check if the room with this id exist
         if (Server.Rooms.ContainsKey(receive.RoomId))
         {
             //玩家模式开始游戏
@@ -331,38 +355,15 @@ public class Network
         }
     }
 
-    private void SendMessage(Player player, byte[] data)
-    {
-        SendMessage receive = NetworkUtils.Deserialize<SendMessage>(data);
-
-        receive.Suc = true;
-
-        if (Server.Rooms.ContainsKey(receive.RoomId))
-        {
-            data = NetworkUtils.Serialize(receive);
-
-            foreach (var each in Server.Rooms[receive.RoomId].Players)
-            {
-                each.Send(MessageType.SendMessage, data);
-            }
-        }
-        else
-        {
-            Console.WriteLine($"玩家:{player.Name}消息发送失败");
-            //向玩家发送失败操作结果
-            player.Send(MessageType.SendMessage, data);
-        }
-    }
-
     private bool ChessResult(Chess chess, PlayChess result)
     {
         bool over = false;
-        //操作成功
+        // succes
         result.Suc = true;
         switch (chess)
         {
             case Chess.Null:
-                //操作失败
+                // faild
                 result.Suc = false;
                 break;
             case Chess.None:

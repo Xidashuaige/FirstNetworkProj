@@ -1,2 +1,3 @@
 # FirstNetworkProj
- 第一款联网程序
+
+My fist network project, make with c# console(Server) & Unity(Client)

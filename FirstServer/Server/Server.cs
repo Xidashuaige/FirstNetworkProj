@@ -64,7 +64,7 @@ public class Room
     /// </summary>
     public void Close()
     {
-        //所有玩家跟观战者退出房间
+        // remove all players
         foreach (var each in Players)
         {
             each.ExitRoom();
@@ -159,36 +159,36 @@ public static class Server
 
         while (true)
         {
-            // 解析数据包过程(服务器与客户端需要严格按照一定的协议制定数据包)
-            byte[] data = new byte[4];
+            // The server and client need to formulate data packages strictly in accordance with certain protocols
+            byte[] data = new byte[4]; // firstly we only read the first 4 byte, which will be the message type
 
-            int length = 0;                            // message lenght
+            int length = 0;                            // message length
             MessageType type = MessageType.None;       // message type
-            int receive = 0;                           //接收信息
+            int receive = 0;                           // length received
 
             try
             {
-                receive = client.Receive(data); //同步接受消息 // 这句应该会阻塞代码
+                receive = client.Receive(data); // this line will block the thread
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{client.RemoteEndPoint}已掉线:{ex.Message}");
+                Console.WriteLine($"{client.RemoteEndPoint} offline :{ex.Message}");
                 player.Offline();
                 return;
             }
 
-            //包头接收不完整
+            // if read faild
             if (receive < data.Length)
             {
-                Console.WriteLine($"{client.RemoteEndPoint}已掉线");
+                Console.WriteLine($"{client.RemoteEndPoint} offline");
                 player.Offline();
                 return;
             }
 
-            //解析消息过程
+            // convert read head byte to enum
             using (MemoryStream stream = new MemoryStream(data))
             {
-                BinaryReader binary = new BinaryReader(stream, Encoding.UTF8); //UTF-8格式解析
+                BinaryReader binary = new BinaryReader(stream, Encoding.UTF8); // read as UTF-8 format 
                 try
                 {
                     length = binary.ReadUInt16();
@@ -196,20 +196,20 @@ public static class Server
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine($"{client.RemoteEndPoint}已掉线");
+                    Console.WriteLine($"{client.RemoteEndPoint} offline");
                     player.Offline();
                     return;
                 }
             }
 
-            //如果有包体
+            // if have body, then read the remaining part of message
             if (length - 4 > 0)
             {
                 data = new byte[length - 4];
                 receive = client.Receive(data);
                 if (receive < data.Length)
                 {
-                    Console.WriteLine($"{client.RemoteEndPoint}已掉线");
+                    Console.WriteLine($"{client.RemoteEndPoint} offline");
                     player.Offline();
                     return;
                 }
@@ -220,13 +220,12 @@ public static class Server
                 receive = 0;
             }
 
-            Console.WriteLine($"接受到消息, 房间数:{Rooms.Count}, 玩家数:{Players.Count}, 消息类型:{type}");
+            Console.WriteLine($"receive message, room count:{Rooms.Count}, player count:{Players.Count}, message type:{type}");
 
-            //执行回调事件
             if (_callBacks.ContainsKey(type))
             {
                 CallBack callBack = new CallBack(player, data, _callBacks[type]);
-                //放入回调执行线程
+                // add handle to the callbacks queue
                 _callBackQueue.Enqueue(callBack);
             }
         }

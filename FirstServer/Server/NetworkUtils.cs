@@ -4,16 +4,16 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 
 /// <summary>
-/// 网络工具类 <see langword="static"/>
+/// network tools <see langword="static"/>
 /// </summary>
 public static class NetworkUtils
 {
     /// <summary>
-    /// obj -> bytes, 如果obj未被标记为 [Serializable] 则返回null
+    /// obj -> bytes, if object doesn't mark as [Serializable] then return null
     /// </summary>
     public static byte[] Serialize(object obj)
     {
-        //物体不为空且可被序列化
+        // obj can't be null
         if (obj == null || !obj.GetType().IsSerializable) return null;
 
         BinaryFormatter formatter = new BinaryFormatter();
@@ -26,11 +26,11 @@ public static class NetworkUtils
     }
 
     /// <summary>
-    /// bytes -> obj, 如果obj未被标记为 [Serializable] 则返回null
+    /// bytes -> obj, if object doesn't mark as [Serializable] then return null
     /// </summary>
     public static T Deserialize<T>(byte[] data) where T : class
     {
-        //数据不为空且T是可序列化的类型
+        // obj can't be null & T must be serializable
         if (data == null || !typeof(T).IsSerializable) return null;
 
         BinaryFormatter formatter = new BinaryFormatter();
@@ -41,16 +41,14 @@ public static class NetworkUtils
         }
     }
 
-    /// <summary>
-    /// 获取本机IPv4,获取失败则返回null
-    /// </summary>
     public static string GetLocalIPv4()
     {
-        string hostName = Dns.GetHostName(); //得到主机名
+        string hostName = Dns.GetHostName(); // get host name
+
         IPHostEntry iPEntry = Dns.GetHostEntry(hostName);
+        
         for (int i = 0; i < iPEntry.AddressList.Length; i++)
         {
-            //从IP地址列表中筛选出IPv4类型的IP地址
             if (iPEntry.AddressList[i].AddressFamily == AddressFamily.InterNetwork)
             {
                 return iPEntry.AddressList[i].ToString();

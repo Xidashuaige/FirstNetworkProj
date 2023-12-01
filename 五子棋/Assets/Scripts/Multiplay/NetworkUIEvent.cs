@@ -42,13 +42,13 @@ public class NetworkUIEvent : MonoBehaviour
     private void Start()
     {
         //绑定按钮事件
-        _connectServerBtn.onClick.AddListener(_ConnectServerBtn);
-        _enrollBtn.onClick.AddListener(_EnrollBtn);
-        _creatRoomBtn.onClick.AddListener(_CreatRoomBtn);
-        _enterRoomBtn.onClick.AddListener(_EnterRoomBtn);
-        _exitRoomBtn.onClick.AddListener(_ExitRoomBtn);
-        _startGameBtn.onClick.AddListener(_StartGameBtn);
-        _sendMessage.onClick.AddListener(_SendMessageBtn);
+        _connectServerBtn.onClick.AddListener(ConnectServerBtn);
+        _enrollBtn.onClick.AddListener(EnrollBtn);
+        _creatRoomBtn.onClick.AddListener(CreatRoomBtn);
+        _enterRoomBtn.onClick.AddListener(EnterRoomBtn);
+        _exitRoomBtn.onClick.AddListener(ExitRoomBtn);
+        _startGameBtn.onClick.AddListener(StartGameBtn);
+        _sendMessage.onClick.AddListener(SendMessageBtn);
 
         NetworkPlayer.Instance.OnPlayingChange += (playing) =>
         {
@@ -75,7 +75,7 @@ public class NetworkUIEvent : MonoBehaviour
         };
     }
 
-    private void _ConnectServerBtn()
+    private void ConnectServerBtn()
     {
         if (_ipAddressIpt.text != string.Empty)
             NetworkClient.Connect(_ipAddressIpt.text);
@@ -85,7 +85,7 @@ public class NetworkUIEvent : MonoBehaviour
         }
     }
 
-    private void _EnrollBtn()
+    private void EnrollBtn()
     {
         if (_nameIpt.text != string.Empty)
             Network.Instance.EnrollRequest(_nameIpt.text);
@@ -95,7 +95,7 @@ public class NetworkUIEvent : MonoBehaviour
         }
     }
 
-    private void _CreatRoomBtn()
+    private void CreatRoomBtn()
     {
         int roomId;
         int.TryParse(_roomIdIpt.text, out roomId);
@@ -108,7 +108,7 @@ public class NetworkUIEvent : MonoBehaviour
         }
     }
 
-    private void _EnterRoomBtn()
+    private void EnterRoomBtn()
     {
         int roomId;
         int.TryParse(_roomIdIpt.text, out roomId);
@@ -121,17 +121,17 @@ public class NetworkUIEvent : MonoBehaviour
         }
     }
 
-    private void _ExitRoomBtn()
+    private void ExitRoomBtn()
     {
         Network.Instance.ExitRoomRequest(NetworkPlayer.Instance.RoomId);
     }
 
-    private void _StartGameBtn()
+    private void StartGameBtn()
     {
         Network.Instance.StartGameRequest(NetworkPlayer.Instance.RoomId);
     }
 
-    private void _SendMessageBtn()
+    private void SendMessageBtn()
     {
         Network.Instance.SendMessageRequest(NetworkPlayer.Instance.RoomId, _messageIpt.text);
         _messageIpt.text = "";

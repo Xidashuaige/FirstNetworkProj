@@ -3,60 +3,60 @@
 namespace Multiplay
 {
     /// <summary>
-    /// 棋子类型
+    /// Chess message type
     /// </summary>
     public enum Chess
     {
-        //棋子类型
-        None, //空棋
-        Black,//黑棋
-        White,//白棋
+        None, 
+        Black,
+        White,
 
-        //以下用于胜利判断结果和操作结果
-        Draw, //平局
-        Null, //表示无结果(用于用户操作失败情况下的返回值)
+        // for check winner
+        Draw, // draw
+        Null, // have a noresult
     }
 
     /// <summary>
-    /// 消息类型
+    /// General message type
     /// </summary>
     public enum MessageType
     {
-        None,         //空类型
-        HeartBeat,    //心跳包验证
+        // Server & special message
+        None,         
+        HeartBeat,    
 
-        //以下为玩家操作请求类型
-        Enroll,       //注册
-        CreatRoom,    //创建房间
-        EnterRoom,    //进入房间
-        ExitRoom,     //退出房间
-        StartGame,    //开始游戏
-        PlayChess,    //下棋
-        SendMessage,  //发送消息
+        // Player message
+        Enroll,      
+        CreatRoom,    
+        EnterRoom,   
+        ExitRoom,    
+        StartGame,   
+        PlayChess,    
+        SendMessage,  
     }
 
     [Serializable]
     public class Enroll
     {
-        public string Name;//姓名
+        public string Name;
 
-        public bool Suc;   //是否成功
+        public bool Suc;  
     }
 
     [Serializable]
     public class CreatRoom
     {
-        public int RoomId; //房间号码
+        public int RoomId;
 
-        public bool Suc;   //是否成功
+        public bool Suc;  
     }
 
     [Serializable]
     public class EnterRoom
     {
-        public int RoomId;      //房间号码
+        public int RoomId;     
 
-        public Result result;   //结果
+        public Result result; 
         public enum Result
         {
             None,
@@ -68,39 +68,39 @@ namespace Multiplay
     [Serializable]
     public class ExitRoom
     {
-        public int RoomId;  //房间号码
+        public int RoomId; 
 
-        public bool Suc;    //是否成功
+        public bool Suc;    
     }
 
     [Serializable]
     public class StartGame
     {
-        public int RoomId;            //房间号码
+        public int RoomId;         
 
-        public bool Suc;              //是否成功
-        public bool First;            //是否先手
-        public bool Watch;            //是否是观察者
+        public bool Suc;            
+        public bool First;           
+        public bool Watch;         
     }
 
     [Serializable]
     public class PlayChess
     {
-        public int RoomId;       //房间号码
-        public Chess Chess;      //棋子类型
-        public int X;            //棋子坐标
-        public int Y;            //棋子坐标
+        public int RoomId;       
+        public Chess Chess;    
+        public int X;            
+        public int Y;            
 
-        public bool Suc;         //操作结果
-        public Chess Challenger; //胜利者
+        public bool Suc;        
+        public Chess Challenger; 
     }
 
     [Serializable]
     public class SendMessage
     {
-        public int RoomId;       //房间号码
-        public string Message;   //消息
-        public string Owner;     //发送者
-        public bool Suc;         //操作结果
+        public int RoomId;      
+        public string Message;  
+        public string Owner;   
+        public bool Suc;        
     }
 }
