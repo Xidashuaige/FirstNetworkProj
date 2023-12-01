@@ -10,7 +10,7 @@ class Program
 
         Console.WriteLine("Server Start!");
 
-        Console.WriteLine($"ip: {Server.GetServerIP()}");
+        Console.WriteLine($"ip: {ip}");
 
         Console.ReadKey();
     }
