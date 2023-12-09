@@ -1,0 +1,9 @@
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\bin\Release\Server.exe.config
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\bin\Release\Server.exe
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\bin\Release\Server.pdb
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\bin\Release\Message.dll
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Release\Server.csproj.AssemblyReference.cache
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Release\Server.csproj.CoreCompileInputs.cache
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Release\Server.csproj.CopyComplete
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Release\Server.exe
+D:\Chen\zixue\Unity\FirstNetworkProj\FirstServer\Server\obj\Release\Server.pdb
