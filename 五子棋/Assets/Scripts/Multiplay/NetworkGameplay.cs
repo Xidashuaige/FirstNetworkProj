@@ -24,6 +24,8 @@ public class NetworkGameplay : MonoBehaviour
     [SerializeField]
     private GameObject _whiteChess;                    //需要实例化的白棋
 
+    [SerializeField] private MessageManager _messageManager;
+
     [SerializeField]
     private Text _reciveText;
     [SerializeField]
@@ -163,8 +165,8 @@ public class NetworkGameplay : MonoBehaviour
         listPage[(int)page].SetActive(true);
     }
 
-    public void ShowText(string text)
+    public void ShowText(string owner, string message)
     {
-        _reciveText.text = text;
+        _messageManager.AddMessage(owner, message);
     }
 }

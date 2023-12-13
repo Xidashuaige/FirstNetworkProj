@@ -62,7 +62,7 @@ public class Network : MonoBehaviour
         NetworkClient.Enqueue(MessageType.PlayChess, data);
     }
 
-    public void SendMessageRequest(int roomId,string message)
+    public void SendMessageRequest(int roomId, string message)
     {
         SendMessage request = new SendMessage();
 
@@ -251,7 +251,7 @@ public class Network : MonoBehaviour
         }
 
         // Print test
-        NetworkGameplay.Instance.ShowText(result.Owner + ": " + result.Message);
+        NetworkGameplay.Instance.ShowText(result.Owner, result.Message);
     }
 
     #endregion
